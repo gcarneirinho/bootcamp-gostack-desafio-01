@@ -10,11 +10,11 @@ let requisicoes = 0;
 
 // Some data to start
 projects.push({
-    id: "1",
+    id: 1,
     title: "New project 01",
     tasks: ["task 1", "task 2", "task 3"]
 }, {
-    id: "2",
+    id: 2,
     title: "New Project 02",
     tasks: ["task 1"]
 });
@@ -26,6 +26,8 @@ function checkProjectId(req, res, next) {
 
     const project = projects.find(proj => proj.id == id);
 
+    req.params.project = project;
+
     if (!project) {
         return res.status(400).json({ error: "No project found" });
     }
@@ -36,13 +38,7 @@ function checkProjectId(req, res, next) {
 // Middleware aditional
 function checkProjectTaskId(req, res, next) {
 
-    const { id, taskIndex } = req.params;
-
-    const project = projects.find(proj => proj.id == id);
-
-    if (!project) {
-        return res.status(400).json({ error: "No project found" });
-    }
+    const { project, taskIndex } = req.params;
 
     const taskId = project.tasks[taskIndex];
 
@@ -121,7 +117,7 @@ server.post('/projects/:id/tasks', checkProjectId, (req, res) => {
 })
 
 // Remove task from project
-server.post('/projects/:id/tasks/:taskIndex', checkProjectTaskId, (req, res) => {
+server.post('/projects/:id/tasks/:taskIndex',checkProjectId, checkProjectTaskId, (req, res) => {
     const {id, taskIndex} = req.params;
 
     const projTaskRemove = projects.find(proj => proj.id == id);
